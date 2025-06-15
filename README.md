@@ -22,6 +22,78 @@
 
    Simpan ketiga data itu!
 
+## Webhook
+Biar sistem kamu bisa tahu kalau:
+- Ada pesan masuk
+- Ada error
+- Status pesan terkirim, dibaca, dst
+
+Kamu tinggal siapkan endpoint seperti https://domainkamu.com/webhook
+daftarkan di Developer App Settings → Webhooks
+
+**Contoh webhook Node.js**
+```js
+// Verifikasi webhook
+app.get("/webhook", (req, res) => {
+  const mode = req.query["hub.mode"];
+  const token = req.query["hub.verify_token"];
+  const challenge = req.query["hub.challenge"];
+
+  if (mode === "subscribe" && token === VERIFY_TOKEN) {
+    console.log("✅ WEBHOOK_VERIFIED");
+    res.status(200).send(challenge);
+  } else {
+    res.sendStatus(403);
+  }
+});
+
+// Handle pesan masuk
+app.post("/webhook", async (req, res) => {
+  const body = req.body;
+  console.log(JSON.stringify(body, null, 2));
+
+  const msg = body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
+  const from = msg?.from;
+
+  if (!from) return res.sendStatus(200);
+
+  if (msg.type === "interactive" && msg.interactive?.type === "button_reply") {
+    const payload = msg.interactive.button_reply.id;
+
+    switch (payload) {
+      case "info_harga":
+        await sendText(
+          from,
+          "Model dan harga mobil terbaru bisa Anda lihat di situs resmi kami: https://www.honda-indonesia.com/"
+        );
+        break;
+      case "jadwal_buka":
+        await sendText(
+          from,
+          "Kami buka setiap Senin–Jumat, pukul 08.00–17.00 WIB. Kami tunggu kedatangan Anda!"
+        );
+        break;
+      case "status_servis":
+        await sendText(
+          from,
+          "Kendaraan Anda dengan Nomor Polisi AB 2849 DK sedang ditangani oleh teknisi kami. Silakan pantau statusnya secara berkala melalui aplikasi e-Care. Terima kasih atas kesabaran Anda."
+        );
+        break;
+      default:
+        await sendText(
+          from,
+          "Maaf, pilihan tidak dikenali. Silakan pilih dari menu yang tersedia."
+        );
+    }
+  } else {
+    // Jika bukan klik tombol, kirim menu utama
+    await sendMenu(from);
+  }
+
+  res.sendStatus(200);
+});
+```
+
 ## Mengirim pesan menggunakan template
 
 **Endpoint**
