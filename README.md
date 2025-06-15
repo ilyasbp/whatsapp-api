@@ -1,6 +1,7 @@
 # Whatsapp Business API
 
 ## Getting Started
+
 1. Buat akun developer facebook
 2. Buat aplikasi baru
    - Klik tombol “My Apps” → “Create App”
@@ -10,12 +11,13 @@
      - Email developer
      - Hubungkan ke akun bisnis (kalau belum punya, bisa lewati dulu)
    - Klik “Create App”
-4. Setup WhatsApp API
+3. Setup WhatsApp API
    - Setelah aplikasi berhasil dibuat, di dashboard pilih menu “WhatsApp”
    - Klik “Set up”
-5. Catat Data API
+4. Catat Data API
 
    Di halaman WhatsApp API, kamu akan melihat:
+
    - Temporary Access Token
    - Phone Number ID
    - WhatsApp Business Account ID
@@ -23,7 +25,9 @@
    Simpan ketiga data itu!
 
 ## Webhook
+
 Biar sistem kamu bisa tahu kalau:
+
 - Ada pesan masuk
 - Ada error
 - Status pesan terkirim, dibaca, dst
@@ -32,6 +36,7 @@ Kamu tinggal siapkan endpoint seperti https://domainkamu.com/webhook
 daftarkan di Developer App Settings → Webhooks
 
 **Contoh webhook Node.js**
+
 ```js
 // Verifikasi webhook
 app.get("/webhook", (req, res) => {
@@ -97,11 +102,13 @@ app.post("/webhook", async (req, res) => {
 ## Mengirim pesan menggunakan template
 
 **Endpoint**
+
 ```
 https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages
 ```
 
 **Header**
+
 ```json
 {
   "Authorization": "Bearer YOUR_ACCESS_TOKEN",
@@ -110,6 +117,7 @@ https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages
 ```
 
 **Body**
+
 ```json
 {
   "messaging_product": "whatsapp",
@@ -138,47 +146,56 @@ https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages
   }
 }
 ```
+
 keterangan:
+
 - nomor tujuannya `6281234567890`
 - typenya `template`
 - template yang dipakai `notifikasi_servis_selesai`
 - parameternya ada 2 bertipe text
 
 **Contoh Node.js**
+
 ```js
-await axios.post(`https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`, {
-  messaging_product: 'whatsapp',
-  to: '6281234567890',
-  type: 'template',
-  template: {
-    name: 'notifikasi_servis_selesai',
-    language: { code: 'id' },
-    components: [
-      {
-        type: 'body',
-        parameters: [
-          { type: 'text', text: 'Ilyas' },
-          { type: 'text', text: 'L 1234 XY' }
-        ]
-      }
-    ]
+await axios.post(
+  `https://graph.facebook.com/v22.0/${PHONE_NUMBER_ID}/messages`,
+  {
+    messaging_product: "whatsapp",
+    to: "6281234567890",
+    type: "template",
+    template: {
+      name: "notifikasi_servis_selesai",
+      language: { code: "id" },
+      components: [
+        {
+          type: "body",
+          parameters: [
+            { type: "text", text: "Ilyas" },
+            { type: "text", text: "L 1234 XY" },
+          ],
+        },
+      ],
+    },
+  },
+  {
+    headers: {
+      Authorization: `Bearer ${ACCESS_TOKEN}`,
+      "Content-Type": "application/json",
+    },
   }
-}, {
-  headers: {
-    Authorization: `Bearer ${ACCESS_TOKEN}`,
-    'Content-Type': 'application/json'
-  }
-});
+);
 ```
 
 ## Mengirim pesan interaktif
 
 **Endpoint**
+
 ```
 https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages
 ```
 
 **Header**
+
 ```json
 {
   "Authorization": "Bearer YOUR_ACCESS_TOKEN",
@@ -187,6 +204,7 @@ https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages
 ```
 
 **Body**
+
 ```json
 {
   "messaging_product": "whatsapp",
@@ -225,12 +243,15 @@ https://graph.facebook.com/v22.0/{PHONE_NUMBER_ID}/messages
   }
 }
 ```
+
 keterangan:
+
 - nomor tujuannya `6281234567890`
 - typenya `interactive`
 - actionnya ada 3 button
 
 **Contoh Node.js**
+
 ```js
 async function sendMenu(to) {
   const url = `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`;
@@ -284,6 +305,7 @@ async function sendMenu(to) {
 ## Response
 
 **Response message ketika user pencet tombol interactive**
+
 ```json
 {
   "object": "whatsapp_business_account",
@@ -335,6 +357,7 @@ async function sendMenu(to) {
 ```
 
 **Response message ketika user kirim pesan berupa text**
+
 ```json
 {
   "object": "whatsapp_business_account",
